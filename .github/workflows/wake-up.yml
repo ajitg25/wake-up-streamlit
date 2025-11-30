@@ -1,0 +1,34 @@
+name: Wake Up Streamlit Apps
+
+on:
+  schedule:
+    # Run every hour
+    - cron: '0 * * * *'
+  workflow_dispatch:  # Allow manual trigger
+
+jobs:
+  wake-up:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      
+      - name: Install dependencies
+        run: |
+          pip install playwright
+          playwright install chromium
+      
+      - name: Run wake-up script
+        run: python automation_script.py
+      
+      - name: Show results
+        if: always()
+        run: |
+          echo "Wake-up script completed!"
+          echo "Check the logs above for details."
