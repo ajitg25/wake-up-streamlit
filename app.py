@@ -23,39 +23,101 @@ def git_commit_and_push(message):
     try:
         import subprocess
         
+        print(f"[DEBUG] Starting git commit and push for: {message}")
+        
         # Check if GitHub token is available
         github_token = st.secrets.get("GITHUB_TOKEN", None)
         if not github_token:
-            st.warning("⚠️ GitHub token not configured. Please add GITHUB_TOKEN to Streamlit secrets.")
+            error_msg = "⚠️ GitHub token not configured. Please add GITHUB_TOKEN to Streamlit secrets."
+            print(f"[ERROR] {error_msg}")
+            st.warning(error_msg)
             return False
         
+        print(f"[DEBUG] GitHub token found (length: {len(github_token)})")
+        
         # Configure git (needed for Streamlit Cloud)
-        subprocess.run(['git', 'config', 'user.name', 'Streamlit App'], check=True)
-        subprocess.run(['git', 'config', 'user.email', 'app@streamlit.io'], check=True)
+        print("[DEBUG] Configuring git user...")
+        result = subprocess.run(['git', 'config', 'user.name', 'Streamlit App'], 
+                               capture_output=True, text=True)
+        print(f"[DEBUG] Git config user.name: {result.returncode}, stdout: {result.stdout}, stderr: {result.stderr}")
+        
+        result = subprocess.run(['git', 'config', 'user.email', 'app@streamlit.io'], 
+                               capture_output=True, text=True)
+        print(f"[DEBUG] Git config user.email: {result.returncode}, stdout: {result.stdout}, stderr: {result.stderr}")
         
         # Get current remote URL and update with token
+        print("[DEBUG] Getting remote URL...")
         result = subprocess.run(['git', 'remote', 'get-url', 'origin'], 
-                              capture_output=True, text=True, check=True)
+                              capture_output=True, text=True)
+        if result.returncode != 0:
+            print(f"[ERROR] Failed to get remote URL: {result.stderr}")
+            st.error(f"Failed to get remote URL: {result.stderr}")
+            return False
+            
         remote_url = result.stdout.strip()
+        print(f"[DEBUG] Remote URL: {remote_url}")
         
         # Convert to authenticated URL
         if remote_url.startswith('https://github.com/'):
             auth_url = remote_url.replace('https://github.com/', 
                                          f'https://{github_token}@github.com/')
-            subprocess.run(['git', 'remote', 'set-url', 'origin', auth_url], check=True)
+            print(f"[DEBUG] Setting authenticated remote URL...")
+            result = subprocess.run(['git', 'remote', 'set-url', 'origin', auth_url], 
+                                   capture_output=True, text=True)
+            print(f"[DEBUG] Set remote URL: {result.returncode}, stderr: {result.stderr}")
         
-        # Add, commit, and push
-        subprocess.run(['git', 'add', WEBSITES_FILE], check=True)
-        subprocess.run(['git', 'commit', '-m', message], check=True)
-        subprocess.run(['git', 'push'], check=True)
+        # Add files
+        print(f"[DEBUG] Adding {WEBSITES_FILE}...")
+        result = subprocess.run(['git', 'add', WEBSITES_FILE], 
+                               capture_output=True, text=True)
+        print(f"[DEBUG] Git add: {result.returncode}, stdout: {result.stdout}, stderr: {result.stderr}")
+        if result.returncode != 0:
+            st.error(f"Git add failed: {result.stderr}")
+            return False
         
+        # Commit
+        print(f"[DEBUG] Committing with message: {message}")
+        result = subprocess.run(['git', 'commit', '-m', message], 
+                               capture_output=True, text=True)
+        print(f"[DEBUG] Git commit: {result.returncode}, stdout: {result.stdout}, stderr: {result.stderr}")
+        if result.returncode != 0:
+            # Check if it's "nothing to commit"
+            if "nothing to commit" in result.stdout or "nothing to commit" in result.stderr:
+                print("[DEBUG] Nothing to commit (file unchanged)")
+                st.info("No changes to commit")
+                return True
+            else:
+                st.error(f"Git commit failed: {result.stderr}")
+                return False
+        
+        # Push
+        print("[DEBUG] Pushing to remote...")
+        result = subprocess.run(['git', 'push'], 
+                               capture_output=True, text=True, timeout=30)
+        print(f"[DEBUG] Git push: {result.returncode}, stdout: {result.stdout}, stderr: {result.stderr}")
+        if result.returncode != 0:
+            st.error(f"Git push failed: {result.stderr}")
+            return False
+        
+        print("[DEBUG] Git commit and push completed successfully!")
         return True
+        
     except subprocess.CalledProcessError as e:
-        st.error(f"Git operation failed: {e}")
+        error_msg = f"Git operation failed: {e}, stdout: {e.stdout if hasattr(e, 'stdout') else 'N/A'}, stderr: {e.stderr if hasattr(e, 'stderr') else 'N/A'}"
+        print(f"[ERROR] {error_msg}")
+        st.error(error_msg)
+        return False
+    except subprocess.TimeoutExpired:
+        error_msg = "Git push timed out (30s). Check your network connection."
+        print(f"[ERROR] {error_msg}")
+        st.error(error_msg)
         return False
     except Exception as e:
-        st.error(f"Error: {e}")
+        error_msg = f"Unexpected error: {type(e).__name__}: {e}"
+        print(f"[ERROR] {error_msg}")
+        st.error(error_msg)
         return False
+
 
 
 def main():
@@ -94,9 +156,12 @@ def main():
                     websites.append(new_website)
                     save_websites(websites)
                     
+
+                    print("adding website")
                     # Auto-commit to GitHub
                     with st.spinner("Saving to GitHub..."):
                         if git_commit_and_push(f"Add website: {new_website}"):
+                            print("website added")
                             st.success(f"✅ Added and committed: {new_website}")
                         else:
                             st.warning("⚠️ Website added locally but git push failed. You may need to commit manually.")
