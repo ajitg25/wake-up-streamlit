@@ -62,22 +62,22 @@ def main():
         else:
             st.error("❌ Please enter a website URL")
     
-    # # Display existing websites
-    # st.markdown("---")
-    # st.subheader("📋 Active Websites")
+    # Display existing websites
+    st.markdown("---")
+    st.subheader("📋 Active Websites")
     
-    # if websites:
-    #     for idx, website in enumerate(websites):
-    #         col1, col2 = st.columns([4, 1])
-    #         with col1:
-    #             st.text(f"{idx + 1}. {website}")
-    #         with col2:
-    #             if st.button("🗑️", key=f"delete_{idx}", help="Remove this website"):
-    #                 websites.pop(idx)
-    #                 save_websites(websites)
-    #                 st.rerun()
-    # else:
-    #     st.info("No websites added yet. Add one above!")
+    if websites:
+        for idx, website in enumerate(websites):
+            col1, col2 = st.columns([4, 1])
+            with col1:
+                st.text(f"{idx + 1}. {website}")
+            with col2:
+                if st.button("🗑️", key=f"delete_{idx}", help="Remove this website"):
+                    websites.pop(idx)
+                    save_websites(websites)
+                    st.rerun()
+    else:
+        st.info("No websites added yet. Add one above!")
     
     # Footer
     st.markdown("---")
