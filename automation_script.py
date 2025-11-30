@@ -2,7 +2,7 @@ from playwright.sync_api import sync_playwright
 
 def run():
     with sync_playwright() as p:
-        browser = p.chromium.launch(headless=False)
+        browser = p.chromium.launch(headless=True)
         page = browser.new_page()
 
         print("Navigating to https://ajitg25-book-recommender-app-1pqxpk.streamlit.app/ ...")
