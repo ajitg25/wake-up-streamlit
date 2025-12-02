@@ -13,10 +13,18 @@ def main():
     st.markdown("---")
     
     st.markdown("""
+    ### 🛑 The Problem
+    As a developer, getting early traffic is hard enough. If a potential user lands on your Streamlit app only to see a **"Waking up..."** screen, they'll likely bounce and never come back.
+    
+    ### ✅ The Solution
+    We've built an automation tool that makes sure your Streamlit apps stay **awake and ready** for every visitor, instantly.
+    """)
+
+    st.markdown("""
     ### How it works:
     1. Enter your Streamlit app name below (e.g., `my-app`)
     2. The URL gets automatically formatted and saved to MongoDB
-    3. GitHub Actions runs every hour to wake up your apps
+    3. GitHub Actions runs every 12 hours to wake up your apps
     4. Your apps stay active and don't go to sleep! 🚀
     """)
     
@@ -28,15 +36,15 @@ def main():
         st.info("Please configure MONGODB_URI in Streamlit secrets.")
         return
     
-    # Load existing websites
+    # Load existing apps
     try:
         websites = db.get_all_websites()
     except Exception as e:
-        st.error(f"❌ Error loading websites: {e}")
+        st.error(f"❌ Error loading apps: {e}")
         websites = []
     
-    # Add new website section
-    st.subheader("➕ Add New Website")
+    # Add new app section
+    st.subheader("➕ Add New App")
     
     # Create a structured input with prefix and suffix
     st.markdown("**Enter your Streamlit app name:**")
@@ -58,7 +66,7 @@ def main():
     with col3:
         st.markdown("<div><b>.streamlit.app/</b></div>", unsafe_allow_html=True)
     
-    if st.button("Add Website", type="primary"):
+    if st.button("Add App", type="primary"):
         if app_name:
             # Remove any spaces and convert to lowercase
             app_name_clean = app_name.strip().lower()
@@ -79,15 +87,15 @@ def main():
                         st.success(f"✅ Added: {full_url}")
                         st.rerun()
                     else:
-                        st.warning("⚠️ This website is already in the list!")
+                        st.warning("⚠️ This app is already in the list!")
                 except Exception as e:
-                    st.error(f"❌ Error adding website: {e}")
+                    st.error(f"❌ Error adding app: {e}")
         else:
             st.error("❌ Please enter an app name")
     
-    # Display existing websites
+    # Display existing apps
     st.markdown("---")
-    st.subheader("📋 Websites which are added")
+    st.subheader("📋 Added Apps")
     
     if websites:
         for idx, website in enumerate(websites):
@@ -95,7 +103,7 @@ def main():
             with col1:
                 st.text(f"{idx + 1}. {website}")
     else:
-        st.info("No websites added yet. Add one above!")
+        st.info("No apps added yet. Add one above!")
     
     # Footer
     st.markdown("---")

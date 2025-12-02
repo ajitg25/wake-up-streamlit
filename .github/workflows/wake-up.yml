@@ -3,7 +3,7 @@ name: Wake Up Streamlit Apps
 on:
   schedule:
     # Run every hour
-    - cron: '0 * * * *'
+    - cron: '0 */12 * * *'
   workflow_dispatch:  # Allow manual trigger
 
 jobs:
