@@ -14,8 +14,8 @@ def main():
     
     st.markdown("""
     ### How it works:
-    1. Add your Streamlit app URL below
-    2. The URL gets saved to MongoDB database
+    1. Enter your Streamlit app name below (e.g., `my-app`)
+    2. The URL gets automatically formatted and saved to MongoDB
     3. GitHub Actions runs every hour to wake up your apps
     4. Your apps stay active and don't go to sleep! 🚀
     """)
@@ -37,27 +37,53 @@ def main():
     
     # Add new website section
     st.subheader("➕ Add New Website")
-    new_website = st.text_input(
-        "Enter your Streamlit app URL:",
-        placeholder="https://your-app.streamlit.app/",
-        help="Enter the full URL of your Streamlit app"
-    )
+    
+    # Create a structured input with prefix and suffix
+    st.markdown("**Enter your Streamlit app name:**")
+    
+    # Use columns with better spacing and alignment
+    col1, col2, col3 = st.columns([0.6, 2.5, 1.2], gap="small", vertical_alignment="center")
+    
+    with col1:
+        st.markdown("<div style='text-align: right;'><b>https://</b></div>", unsafe_allow_html=True)
+    
+    with col2:
+        app_name = st.text_input(
+            "App Name",
+            placeholder="your-app-name",
+            help="Enter only the app name (e.g., 'my-app' for https://my-app.streamlit.app/)",
+            label_visibility="collapsed"
+        )
+    
+    with col3:
+        st.markdown("<div><b>.streamlit.app/</b></div>", unsafe_allow_html=True)
     
     if st.button("Add Website", type="primary"):
-        if new_website:
-            if new_website.startswith("http"):
+        if app_name:
+            # Remove any spaces and convert to lowercase
+            app_name_clean = app_name.strip().lower()
+            
+            # Validate app name format (alphanumeric and hyphens only)
+            if not app_name_clean:
+                st.error("❌ Please enter an app name")
+            elif not all(c.isalnum() or c == '-' for c in app_name_clean):
+                st.error("❌ App name can only contain letters, numbers, and hyphens")
+            elif app_name_clean.startswith('-') or app_name_clean.endswith('-'):
+                st.error("❌ App name cannot start or end with a hyphen")
+            else:
+                # Construct the full URL
+                full_url = f"https://{app_name_clean}.streamlit.app/"
+                
                 try:
-                    if db.add_website(new_website):
-                        st.success(f"✅ Added: {new_website}")
+                    if db.add_website(full_url):
+                        st.success(f"✅ Added: {full_url}")
                         st.rerun()
                     else:
                         st.warning("⚠️ This website is already in the list!")
                 except Exception as e:
                     st.error(f"❌ Error adding website: {e}")
-            else:
-                st.error("❌ Please enter a valid URL starting with http:// or https://")
         else:
-            st.error("❌ Please enter a website URL")
+            st.error("❌ Please enter an app name")
     
     # Display existing websites
     st.markdown("---")
