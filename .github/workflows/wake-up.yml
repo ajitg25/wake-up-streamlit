@@ -21,10 +21,12 @@ jobs:
       
       - name: Install dependencies
         run: |
-          pip install playwright
+          pip install playwright pymongo
           playwright install chromium
       
       - name: Run wake-up script
+        env:
+          MONGODB_URI: ${{ secrets.MONGODB_URI }}
         run: python automation_script.py
       
       - name: Show results

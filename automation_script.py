@@ -1,15 +1,24 @@
 from playwright.sync_api import sync_playwright
 import os
 from datetime import datetime
-
-WEBSITES_FILE = "websites.txt"
+from db_utils import WebsiteDB
 
 def load_websites():
-    """Load websites from the text file"""
-    if os.path.exists(WEBSITES_FILE):
-        with open(WEBSITES_FILE, 'r') as f:
-            return [line.strip() for line in f if line.strip()]
-    return []
+    """Load websites from MongoDB database"""
+    try:
+        # Get MongoDB connection string from environment variable
+        mongodb_uri = os.environ.get("MONGODB_URI")
+        if not mongodb_uri:
+            print("⚠️  MONGODB_URI environment variable not set")
+            return []
+        
+        db = WebsiteDB(mongodb_uri)
+        websites = db.get_all_websites()
+        db.close()
+        return websites
+    except Exception as e:
+        print(f"❌ Error loading websites from database: {e}")
+        return []
 
 def wake_up_website(page, url):
     """Wake up a single website"""
@@ -47,11 +56,11 @@ def run():
     """Main function to wake up all websites"""
     print(f"\n🚀 Starting wake-up script at {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
     
-    # Load websites from file
+    # Load websites from MongoDB
     websites = load_websites()
     
     if not websites:
-        print("⚠️  No websites found in websites.txt")
+        print("⚠️  No websites found in database")
         return
     
     print(f"📋 Found {len(websites)} website(s) to wake up")

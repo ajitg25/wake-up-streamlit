@@ -136,3 +136,6 @@ desktop.ini
 
 # Streamlit secrets (contains tokens)
 .streamlit/secrets.toml
+
+# Old website storage (now using MongoDB)
+websites.txt
