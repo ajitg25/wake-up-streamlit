@@ -95,20 +95,27 @@ def main():
     
     # Display existing apps
     st.markdown("---")
-    st.subheader("📋 Added Apps")
+    st.subheader("📋 Managed Apps")
+    st.markdown("These apps are currently being monitored and kept awake by our automation.")
     
     if websites:
-        for idx, website in enumerate(websites):
-            col1, col2 = st.columns([4, 1])
+        for website in websites:
+            col1, col2 = st.columns([3, 1], vertical_alignment="center")
             with col1:
-                st.text(f"{idx + 1}. {website}")
+                st.markdown(f"🔗 **[{website}]({website})**")
+            with col2:
+                st.success("Active ✅")
     else:
         st.info("No apps added yet. Add one above!")
     
     # Footer
     st.markdown("---")
-    st.caption(f"Last updated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
     
+    st.markdown(
+        f"<div style='text-align: center; color: grey; font-size: small;'>© {datetime.now().year} Ajit Gupta. All rights reserved.</div>",
+        unsafe_allow_html=True
+    )
+
     # Close database connection
     try:
         db.close()
