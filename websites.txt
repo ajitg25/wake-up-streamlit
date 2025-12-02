@@ -1,2 +1,0 @@
-https://ajitgupta.streamlit.app/
-https://twitter-x-analytics.streamlit.app/
