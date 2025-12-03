@@ -4,7 +4,7 @@ Automatically keep your Streamlit apps active and prevent them from going to sle
 
 ## 🎯 What This Does
 
-This system automatically wakes up your Streamlit apps every hour to keep them active and responsive. No more waiting for sleeping apps to restart!
+This system automatically wakes up your Streamlit apps every 12 hours to keep them active and responsive. No more waiting for sleeping apps to restart!
 
 ## 🏗️ Architecture
 
@@ -59,7 +59,7 @@ Then add your Streamlit app URLs through the web interface. They'll be saved dir
 
 ### 4. GitHub Actions Does the Rest!
 
-The GitHub Actions workflow runs automatically every hour and wakes up all your apps from the MongoDB database.
+The GitHub Actions workflow runs automatically every 12 hours and wakes up all your apps from the MongoDB database.
 
 ## 📁 Project Structure
 
