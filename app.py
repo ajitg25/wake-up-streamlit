@@ -46,19 +46,19 @@ def main():
     """)
     
     # Initialize database connection
-    try:
-        db = get_db_connection()
-    except ValueError as e:
-        st.error(f"❌ Database connection error: {e}")
-        st.info("Please configure MONGODB_URI in Streamlit secrets.")
-        return
+    # try:
+    #     db = get_db_connection()
+    # except ValueError as e:
+    #     st.error(f"❌ Database connection error: {e}")
+    #     st.info("Please configure MONGODB_URI in Streamlit secrets.")
+    #     return
     
-    # Load existing apps
-    try:
-        websites = db.get_all_websites()
-    except Exception as e:
-        st.error(f"❌ Error loading apps: {e}")
-        websites = []
+    # # Load existing apps
+    # try:
+    #     websites = db.get_all_websites()
+    # except Exception as e:
+    #     st.error(f"❌ Error loading apps: {e}")
+    #     websites = []
     
     # Add new app section
     st.subheader("➕ Add New App")
@@ -83,7 +83,7 @@ def main():
     with col3:
         st.markdown("<div><b>.streamlit.app/</b></div>", unsafe_allow_html=True)
     
-    if st.button("Add App (DB connection is removed)", type="primary"):
+    if st.button("Add App", type="primary"):
         if app_name:
             # Remove any spaces and convert to lowercase
             app_name_clean = app_name.strip().lower()
@@ -106,7 +106,7 @@ def main():
                     else:
                         st.warning("⚠️ This app is already in the list!")
                 except Exception as e:
-                    st.error(f"❌ Error adding app: {e}")
+                    st.error(f"❌ Error adding app: DB CONNECTION IS REMOVED")
         else:
             st.error("❌ Please enter an app name")
     
@@ -115,15 +115,15 @@ def main():
     st.subheader("📋 Managed Apps")
     st.markdown("These apps are currently being monitored and kept awake by our automation.")
     
-    if websites:
-        for website in websites:
-            col1, col2 = st.columns([3, 1], vertical_alignment="center")
-            with col1:
-                st.markdown(f"🔗 **[{website}]({website})**")
-            with col2:
-                st.success("Click to check status as now are not managed by automation")
-    else:
-        st.info("No apps added yet. Add one above!")
+    # if websites:
+    #     for website in websites:
+    #         col1, col2 = st.columns([3, 1], vertical_alignment="center")
+    #         with col1:
+    #             st.markdown(f"🔗 **[{website}]({website})**")
+    #         with col2:
+    #             st.success("Click to check status as now are not managed by automation")
+    # else:
+    #     st.info("No apps added yet. Add one above!")
     
     # Footer
     st.markdown("---")
