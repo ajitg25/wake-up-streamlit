@@ -1,4 +1,5 @@
 import streamlit as st
+import base64
 from datetime import datetime
 from db_utils import get_db_connection
 
@@ -10,6 +11,22 @@ def main():
     )
     
     st.title("⏰ Keep My Streamlit Apps Awake")
+
+    st.warning("⚠️ Deprecating this project as it violates Streamlit's Terms of Service.")
+
+    # Display clickable image linking to the tweet
+    tweet_url = "https://x.com/unfiltered_ajit/status/1995535758476935456?s=20"
+    try:
+        with open("image.png", "rb") as f:
+            data = base64.b64encode(f.read()).decode("utf-8")
+        st.markdown(
+            f'<a href="{tweet_url}" target="_blank">'
+            f'<img src="data:image/png;base64,{data}" style="width:100%; border-radius: 10px;">'
+            '</a>',
+            unsafe_allow_html=True,
+        )
+    except FileNotFoundError:
+        st.error("Image not found")
     st.markdown("---")
     
     st.markdown("""
@@ -66,7 +83,7 @@ def main():
     with col3:
         st.markdown("<div><b>.streamlit.app/</b></div>", unsafe_allow_html=True)
     
-    if st.button("Add App", type="primary"):
+    if st.button("Add App (DB connection is removed)", type="primary"):
         if app_name:
             # Remove any spaces and convert to lowercase
             app_name_clean = app_name.strip().lower()
@@ -104,7 +121,7 @@ def main():
             with col1:
                 st.markdown(f"🔗 **[{website}]({website})**")
             with col2:
-                st.success("Active ✅")
+                st.success("Click to check status as now are not managed by automation")
     else:
         st.info("No apps added yet. Add one above!")
     
